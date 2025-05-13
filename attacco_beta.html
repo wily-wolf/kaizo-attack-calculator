@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calcolatore Attacco - Beta</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZB7SP38WR0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ZB7SP38WR0');
+  </script>
+  
+  <!-- CSS Navbar -->
+  <link rel="stylesheet" href="css/navbar.css">
+  
+  <style>
+    /* Reset & base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height:100%; font-family: Arial, sans-serif;
+      background: #121212; color: #f0f0f0;
+    }
+
+    body {
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .container {
+      background: #1e1e1e; padding: 2rem; border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+      max-width: 500px; width: 100%;
+    }
+    .header {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.6rem; color: #FFD700;
+    }
+    .badge {
+      background: #FFD700; color: #121212;
+      font-size: 0.75rem; font-weight: 600;
+      padding: 0.2rem 0.6rem; border-radius: 8px;
+    }
+    label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
+    .input-group { margin-bottom: 1rem; }
+    input[type="number"], select {
+      width: 100%; padding: 0.6rem; background: #2a2a2a;
+      border: 1px solid #444; border-radius: 6px;
+      color: #f0f0f0; font-size: 1rem;
+    }
+    .checkbox-wrapper {
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .checkbox-wrapper input {
+      margin: 0; accent-color: #FFD700;
+    }
+    button {
+      width: 100%; padding: 0.75rem;
+      background: #FFD700; color: #121212;
+      border: none; border-radius: 6px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    button:hover { background: #e6c200; }
+    
+    /* Risultato e Tier */
+    .result-container {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .result {
+      padding: 0.75rem;
+      background: #2a2a2a; border-radius: 6px;
+      text-align: center; font-size: 1.1rem; font-weight: 500;
+      line-height: 1.4;
+    }
+    
+    /* Stili per il tier */
+    .tier-container {
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 0.75rem;
+      border-radius: 6px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tier-value {
+      font-size: 1.8rem;
+    }
+    .tier-Splus { background-color: purple; }
+    .tier-S { background-color: #A102A1; }
+    .tier-A { background-color: green; }
+    .tier-B { background-color: #80d180; }
+    .tier-C { background-color: yellow; color: black; }
+    .tier-D { background-color: orange; }
+    .tier-E { background-color: red; }
+    
+    .warning {
+      margin-top: 1.5rem; font-size: 0.85rem;
+      color: #ffa000; line-height: 1.4;
+    }
+    @media (max-width: 500px) {
+      .container { padding: 1.5rem; }
+      h1 { font-size: 1.4rem; }
+    }
+	
+    small {
+      font-size: 0.85em;
+      color: #cccccc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <script src="js/navbar-loader.js" defer></script>
+
+  <div class="container">
+    <div class="header">
+      <h1>Calcolatore Attacco</h1>
+      <span class="badge">Beta</span>
+    </div>
+
+    <div class="input-group">
+      <label for="danno">Danno subito</label>
+      <input type="number" id="danno" min="1" placeholder="Es. 12" />
+    </div>
+
+	<div class="input-group">
+	  <label for="difesa">
+		Difesa del tuo Pokémon
+		<small>(DEF o SPD in base alla mossa subita)</small>
+	  </label>
+	  <input type="number" id="difesa" min="1" placeholder="Es. 20" />
+	</div>
+
+    <div class="input-group">
+      <label for="potenza">Potenza della mossa</label>
+      <input type="number" id="potenza" min="1" placeholder="Es. 80" />
+    </div>
+
+    <div class="checkbox-wrapper">
+      <input type="checkbox" id="stab" />
+      <label for="stab">Mossa STAB (×1.5)</label>
+    </div>
+
+    <div class="input-group">
+      <label for="livelloAtt">Livello dell'avversario</label>
+      <input type="number" id="livelloAtt" min="1" placeholder="Es. 8" />
+    </div>
+
+    <div class="input-group">
+      <label for="moltiplicatore">Moltiplicatore debolezza</label>
+      <select id="moltiplicatore">
+        <option value="0.25">0.25</option>
+        <option value="0.5">0.5</option>
+        <option value="1" selected>1</option>
+        <option value="2">2</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+
+    <button onclick="calcolaAttacco()">Calcola Attacco</button>
+
+    <div class="result-container">
+      <div class="result" id="risultato">Inserisci i valori e premi "Calcola Attacco"</div>
+      <div class="tier-container" id="tierDisplay" style="display: none;"></div>
+    </div>
+
+    <div class="warning">
+      Attenzione: evitate colpi critici o mosse influenzate dal meteo. Il calcolo è più affidabile se subite almeno 5 punti di danno. Ricorda che l'avversario potrebbe avere un'abilità che modifica la potenza delle mosse o il suo attacco.
+    </div>
+  </div>
+
+  <script>
+    // Funzione di arrotondamento come nei giochi Pokémon
+    function pokeRound(num) {
+      return Math.floor(num);
+    }
+    
+    // Funzione per determinare il tier in base al valore di attacco
+    function getTier(attValue) {
+      if (attValue >= 36) return "Splus";
+      if (attValue >= 29) return "S";
+      if (attValue >= 24) return "A";
+      if (attValue >= 19) return "B";
+      if (attValue >= 15) return "C";
+      if (attValue >= 11) return "D";
+      return "E";
+    }
+    
+    // Funzione per ottenere la descrizione del tier
+    function getTierDescription(tier) {
+      switch(tier) {
+        case "Splus": return "Eccezionale";
+        case "S": return "Ottimo";
+        case "A": return "Molto forte";
+        case "B": return "Forte";
+        case "C": return "Medio";
+        case "D": return "Debole";
+        case "E": return "Molto debole";
+        default: return "";
+      }
+    }
+    
+    // Aggiungi event listener per il tasto Enter su tutti i campi input
+    document.addEventListener('DOMContentLoaded', function() {
+      // Seleziona tutti gli input numerici e il select
+      const inputs = document.querySelectorAll('input[type="number"], select');
+      
+      // Aggiungi event listener per ogni campo
+      inputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+          // Se il tasto premuto è Enter (codice 13)
+          if (e.key === 'Enter') {
+            // Previeni il comportamento predefinito
+            e.preventDefault();
+            // Esegui il calcolo
+            calcolaAttacco();
+          }
+        });
+      });
+    });
+
+    function calcolaAttacco() {
+      const dmg = parseFloat(document.getElementById("danno").value);
+      const def = parseFloat(document.getElementById("difesa").value);
+      const pow = parseFloat(document.getElementById("potenza").value);
+      const lvl = parseFloat(document.getElementById("livelloAtt").value);
+      const mult = parseFloat(document.getElementById("moltiplicatore").value);
+      const stab = document.getElementById("stab").checked ? 1.5 : 1.0;
+      
+      const tierDisplay = document.getElementById("tierDisplay");
+      
+      // Nascondi il tier display quando si inizia un nuovo calcolo
+      tierDisplay.style.display = "none";
+
+      if ([dmg, def, pow, lvl, mult].some(v => isNaN(v) || v <= 0)) {
+        return document.getElementById("risultato").textContent = "Per favore, inserisci tutti i valori validi (> 0).";
+      }
+
+      // random factors
+      const rMin = 0.85, rMax = 0.90;
+      
+      // Formula avanzata con arrotondamenti intermedi
+      // Calcolo il fattore di livello con arrotondamento
+      const factorLv = pokeRound((2 * lvl / 5) + 2);
+      
+      // Calcolo il denominatore con arrotondamento
+      const basePower = pokeRound(factorLv * pow);
+      
+      // Calcolo con valore danno pre-arrotondamento per min e max
+      const dmgDivMin = pokeRound(dmg / (stab * mult * rMax));
+      const dmgDivMax = pokeRound(dmg / (stab * mult * rMin));
+      
+      // Sottraggo 2 (come nella formula originale)
+      const afterSubMin = dmgDivMin - 2;
+      const afterSubMax = dmgDivMax - 2;
+      
+      // Moltiplico per 50 e difesa con arrotondamento
+      const numeratorMin = pokeRound(50 * def * afterSubMin);
+      const numeratorMax = pokeRound(50 * def * afterSubMax);
+      
+      // Calcolo finale dell'attacco
+      const attMin = numeratorMin / basePower;
+      const attMax = numeratorMax / basePower;
+      
+      // Aggiungo un fattore di correzione del 5% per compensare eventuali errori
+      const correctionFactor = 1.05;
+      
+      const atkMin = Math.floor(attMin);
+      const atkMax = Math.ceil(attMax * correctionFactor);
+
+      // Calcola la media degli attacchi
+      const avgAttack = Math.round((atkMin + atkMax) / 2);
+      
+      // Determina il tier in base alla media dell'attacco
+      const tier = getTier(avgAttack);
+      
+      // Mostra il risultato numerico
+      document.getElementById("risultato").innerHTML =
+        `Attacco stimato tra:<br><strong>${atkMin}</strong> - <strong>${atkMax}</strong>`;
+      
+      // Tier
+      tierDisplay.className = `tier-container tier-${tier}`;
+      tierDisplay.innerHTML = `
+        <div class="tier-value">Tier ${tier.replace("plus", "+")}</div>
+      `;
+      tierDisplay.style.display = "flex";
+    }
+  </script>
+</body>
+</html>
