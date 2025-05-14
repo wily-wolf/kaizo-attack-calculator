@@ -233,6 +233,16 @@
       return Math.floor(num);
     }
     
+    // Funzione per arrotondamento Pokémon (arrotonda all'intero più vicino, 0.5 arrotondato verso il basso)
+    function pokeRoundNearest(num) {
+      // Se il numero ha esattamente .5 come parte decimale, arrotonda verso il basso
+      if (num % 1 === 0.5) {
+        return Math.floor(num);
+      }
+      // Altrimenti arrotonda al più vicino
+      return Math.round(num);
+    }
+    
     // Funzione per determinare il tier in base al valore di attacco
     function getTier(attValue) {
       if (attValue >= 36) return "Splus";
@@ -334,29 +344,32 @@
         atkMax = Math.ceil(attMax * correctionFactor);
       } else if (formulaType === 2) {
         formulaName = "2";
-        // Formula alternativa: A = ((Damage / (random × STAB × Mult)) - 2) × (50 × D) / ((2 × Level / 5 + 2) × Power)
+        // Formula alternativa corretta con arrotondamenti in stile Pokémon
         
-        // Calcolo diretto senza arrotondamenti intermedi per min e max
-        const dmgDivMin = dmg / (rMaxAlt * stab * mult);
-        const dmgDivMax = dmg / (rMinAlt * stab * mult);
+        // Calcolo diretto con arrotondamenti intermedi per min e max
+        const dmgDivMin = dmg / (rMaxAlt * stab * mult); // Non arrotondato ancora
+        const dmgDivMax = dmg / (rMinAlt * stab * mult); // Non arrotondato ancora
         
         // Sottraggo 2
         const afterSubMin = dmgDivMin - 2;
         const afterSubMax = dmgDivMax - 2;
         
-        // Calcolo il numeratore
-        const numeratorMin = afterSubMin * (50 * def);
-        const numeratorMax = afterSubMax * (50 * def);
+        // Calcolo il numeratore con arrotondamento
+        const term1Min = pokeRoundNearest(50 * def);
+        const term1Max = pokeRoundNearest(50 * def);
+        const numeratorMin = pokeRoundNearest(afterSubMin * term1Min);
+        const numeratorMax = pokeRoundNearest(afterSubMax * term1Max);
         
-        // Calcolo il denominatore
-        const denominator = ((2 * lvl / 5 + 2) * pow);
+        // Calcolo il denominatore con arrotondamento
+        const levelTerm = pokeRoundNearest((2 * lvl / 5) + 2);
+        const denominator = pokeRoundNearest(levelTerm * pow);
         
         // Calcolo finale dell'attacco
         const attMin = numeratorMin / denominator;
         const attMax = numeratorMax / denominator;
         
         // Aggiungo un fattore di correzione
-        const correctionFactor = 1.05;
+        const correctionFactor = 1.00;
         
         atkMin = Math.floor(attMin * correctionFactor);
         atkMax = Math.ceil(attMax * correctionFactor);
