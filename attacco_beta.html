@@ -4,14 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calcolatore Attacco - Beta</title>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZB7SP38WR0"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-ZB7SP38WR0');
-  </script>
   
   <!-- CSS Navbar -->
   <link rel="stylesheet" href="css/navbar.css">
@@ -65,8 +57,31 @@
       border: none; border-radius: 6px;
       font-size: 1rem; font-weight: 600; cursor: pointer;
       transition: background-color 0.2s ease;
+      margin-bottom: 0.5rem;
     }
     button:hover { background: #e6c200; }
+    
+    /* Personalizzazione pulsanti per formula */
+    button:nth-of-type(1) {
+      background: #7b68ee; /* Viola chiaro per formula standard */
+    }
+    button:nth-of-type(1):hover {
+      background: #6a5acd;
+    }
+    
+    button:nth-of-type(2) {
+      background: #20b2aa; /* Turchese per formula alternativa */
+    }
+    button:nth-of-type(2):hover {
+      background: #1b9b94;
+    }
+    
+    button:nth-of-type(3) {
+      background: #ff8c00; /* Arancione per formula precisa */
+    }
+    button:nth-of-type(3):hover {
+      background: #e67e00;
+    }
     
     /* Risultato e Tier */
     .result-container {
@@ -116,6 +131,34 @@
     small {
       font-size: 0.85em;
       color: #cccccc;
+    }
+
+    /* Stili per lo switch di formula */
+    .formula-switch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: #2a2a2a;
+      border-radius: 6px;
+      flex-wrap: wrap;
+    }
+    .formula-option {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+      margin: 0.2rem;
+    }
+    .formula-option.active {
+      background: #444;
+      font-weight: bold;
+    }
+    .formula-option:hover:not(.active) {
+      background: #333;
     }
   </style>
 </head>
@@ -168,10 +211,14 @@
       </select>
     </div>
 
-    <button onclick="calcolaAttacco()">Calcola Attacco</button>
+    <button onclick="calcolaAttacco(1)">Calcola con Formula 1</button>
+    <div style="margin: 0.5rem 0"></div>
+    <button onclick="calcolaAttacco(2)">Calcola con Formula 2</button>
+    <div style="margin: 0.5rem 0"></div>
+    <button onclick="calcolaAttacco(3)">Calcola con Formula 3</button>
 
     <div class="result-container">
-      <div class="result" id="risultato">Inserisci i valori e premi "Calcola Attacco"</div>
+      <div class="result" id="risultato">Inserisci i valori e premi uno dei pulsanti "Calcola"</div>
       <div class="tier-container" id="tierDisplay" style="display: none;"></div>
     </div>
 
@@ -223,14 +270,14 @@
           if (e.key === 'Enter') {
             // Previeni il comportamento predefinito
             e.preventDefault();
-            // Esegui il calcolo
-            calcolaAttacco();
+            // Esegui il calcolo con la formula standard
+            calcolaAttacco(1);
           }
         });
       });
     });
 
-    function calcolaAttacco() {
+    function calcolaAttacco(formulaType) {
       const dmg = parseFloat(document.getElementById("danno").value);
       const def = parseFloat(document.getElementById("difesa").value);
       const pow = parseFloat(document.getElementById("potenza").value);
@@ -247,37 +294,87 @@
         return document.getElementById("risultato").textContent = "Per favore, inserisci tutti i valori validi (> 0).";
       }
 
-      // random factors
+      // random factors per la formula 1
       const rMin = 0.85, rMax = 0.90;
+      // random factors per le formule 2 e 3
+      const rMinAlt = 0.85, rMaxAlt = 1.0;
       
-      // Formula avanzata con arrotondamenti intermedi
-      // Calcolo il fattore di livello con arrotondamento
-      const factorLv = pokeRound((2 * lvl / 5) + 2);
+      let atkMin, atkMax;
+      let formulaName = "";
       
-      // Calcolo il denominatore con arrotondamento
-      const basePower = pokeRound(factorLv * pow);
-      
-      // Calcolo con valore danno pre-arrotondamento per min e max
-      const dmgDivMin = pokeRound(dmg / (stab * mult * rMax));
-      const dmgDivMax = pokeRound(dmg / (stab * mult * rMin));
-      
-      // Sottraggo 2 (come nella formula originale)
-      const afterSubMin = dmgDivMin - 2;
-      const afterSubMax = dmgDivMax - 2;
-      
-      // Moltiplico per 50 e difesa con arrotondamento
-      const numeratorMin = pokeRound(50 * def * afterSubMin);
-      const numeratorMax = pokeRound(50 * def * afterSubMax);
-      
-      // Calcolo finale dell'attacco
-      const attMin = numeratorMin / basePower;
-      const attMax = numeratorMax / basePower;
-      
-      // Aggiungo un fattore di correzione del 5% per compensare eventuali errori
-      const correctionFactor = 1.05;
-      
-      const atkMin = Math.floor(attMin);
-      const atkMax = Math.ceil(attMax * correctionFactor);
+      if (formulaType === 1) {
+        formulaName = "1";
+        // Formula originale
+        // Calcolo il fattore di livello con arrotondamento
+        const factorLv = pokeRound((2 * lvl / 5) + 2);
+        
+        // Calcolo il denominatore con arrotondamento
+        const basePower = pokeRound(factorLv * pow);
+        
+        // Calcolo con valore danno pre-arrotondamento per min e max
+        const dmgDivMin = pokeRound(dmg / (stab * mult * rMax));
+        const dmgDivMax = pokeRound(dmg / (stab * mult * rMin));
+        
+        // Sottraggo 2 (come nella formula originale)
+        const afterSubMin = dmgDivMin - 2;
+        const afterSubMax = dmgDivMax - 2;
+        
+        // Moltiplico per 50 e difesa con arrotondamento
+        const numeratorMin = pokeRound(50 * def * afterSubMin);
+        const numeratorMax = pokeRound(50 * def * afterSubMax);
+        
+        // Calcolo finale dell'attacco
+        const attMin = numeratorMin / basePower;
+        const attMax = numeratorMax / basePower;
+        
+        // Aggiungo un fattore di correzione del 5% per compensare eventuali errori
+        const correctionFactor = 1.05;
+        
+        atkMin = Math.floor(attMin);
+        atkMax = Math.ceil(attMax * correctionFactor);
+      } else if (formulaType === 2) {
+        formulaName = "2";
+        // Formula alternativa: A = ((Damage / (random × STAB × Mult)) - 2) × (50 × D) / ((2 × Level / 5 + 2) × Power)
+        
+        // Calcolo diretto senza arrotondamenti intermedi per min e max
+        const dmgDivMin = dmg / (rMaxAlt * stab * mult);
+        const dmgDivMax = dmg / (rMinAlt * stab * mult);
+        
+        // Sottraggo 2
+        const afterSubMin = dmgDivMin - 2;
+        const afterSubMax = dmgDivMax - 2;
+        
+        // Calcolo il numeratore
+        const numeratorMin = afterSubMin * (50 * def);
+        const numeratorMax = afterSubMax * (50 * def);
+        
+        // Calcolo il denominatore
+        const denominator = ((2 * lvl / 5 + 2) * pow);
+        
+        // Calcolo finale dell'attacco
+        const attMin = numeratorMin / denominator;
+        const attMax = numeratorMax / denominator;
+        
+        // Aggiungo un fattore di correzione
+        const correctionFactor = 1.05;
+        
+        atkMin = Math.floor(attMin * correctionFactor);
+        atkMax = Math.ceil(attMax * correctionFactor);
+      } else {
+        formulaName = "3";
+        // Formula 3 - Precisa senza arrotondamenti intermedi
+        
+        // Formula base: A = ((Damage / (random × STAB × Mult)) - 2) × (50 × D) / ((2 × Level / 5 + 2) × Power)
+        // Senza alcun arrotondamento intermedio
+        
+        // Calcolo per min e max
+        const attMin = ((dmg / (rMaxAlt * stab * mult)) - 2) * (50 * def) / ((2 * lvl / 5 + 2) * pow);
+        const attMax = ((dmg / (rMinAlt * stab * mult)) - 2) * (50 * def) / ((2 * lvl / 5 + 2) * pow);
+        
+        // Solo arrotondamento finale
+        atkMin = Math.floor(attMin);
+        atkMax = Math.ceil(attMax);
+      }
 
       // Calcola la media degli attacchi
       const avgAttack = Math.round((atkMin + atkMax) / 2);
@@ -287,7 +384,7 @@
       
       // Mostra il risultato numerico
       document.getElementById("risultato").innerHTML =
-        `Attacco stimato tra:<br><strong>${atkMin}</strong> - <strong>${atkMax}</strong>`;
+        `Attacco stimato con Formula ${formulaName}:<br><strong>${atkMin}</strong> - <strong>${atkMax}</strong>`;
       
       // Tier
       tierDisplay.className = `tier-container tier-${tier}`;
