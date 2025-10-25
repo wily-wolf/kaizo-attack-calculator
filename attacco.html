@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calcolatore Danno Pokémon</title>
+  
+  <style>
+    /* Reset & base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height:100%; font-family: Arial, sans-serif;
+      background: #121212; color: #f0f0f0;
+    }
+
+    body {
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .container {
+      background: #1e1e1e; padding: 2rem; border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+      max-width: 600px; width: 100%;
+    }
+    .header {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.6rem; color: #FFD700;
+    }
+    .badge {
+      background: #FFD700; color: #121212;
+      font-size: 0.75rem; font-weight: 600;
+      padding: 0.2rem 0.6rem; border-radius: 8px;
+    }
+    label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
+    .input-group { margin-bottom: 1rem; }
+    input[type="number"], select {
+      width: 100%; padding: 0.6rem; background: #2a2a2a;
+      border: 1px solid #444; border-radius: 6px;
+      color: #f0f0f0; font-size: 1rem;
+    }
+    .checkbox-wrapper {
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .checkbox-wrapper input {
+      margin: 0; accent-color: #FFD700;
+    }
+    button {
+      width: 100%; padding: 0.75rem;
+      background: #FFD700; color: #121212;
+      border: none; border-radius: 6px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-bottom: 0.5rem;
+    }
+    button:hover { background: #e6c200; }
+    
+    .result {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: #2a2a2a; border-radius: 6px;
+      text-align: center; font-size: 1.1rem; font-weight: 500;
+      line-height: 1.4;
+    }
+    
+    .warning {
+      margin-top: 1.5rem; font-size: 0.85rem;
+      color: #ffa000; line-height: 1.4;
+    }
+    @media (max-width: 500px) {
+      .container { padding: 1.5rem; }
+      h1 { font-size: 1.4rem; }
+    }
+	
+    small {
+      font-size: 0.85em;
+      color: #cccccc;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .formula-display {
+      background: #2a2a2a;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Calcolatore Danno Pokémon</h1>
+    </div>
+
+    <div class="formula-display">
+      Danno = (((2×Livello/5 + 2) × Potenza × A/D) / 50 + 2) × Bersagli × Amorefiliale × Meteo × Brutto colpo × random × STAB × Type × Scottatura × altro
+    </div>
+
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="livello">Livello</label>
+        <input type="number" id="livello" min="1" value="50" placeholder="Es. 50" />
+      </div>
+
+      <div class="input-group">
+        <label for="potenza">Potenza mossa</label>
+        <input type="number" id="potenza" min="1" value="80" placeholder="Es. 80" />
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="attacco">Attacco (A)</label>
+        <input type="number" id="attacco" min="1" value="100" placeholder="Es. 100" />
+      </div>
+
+      <div class="input-group">
+        <label for="difesa">Difesa (D)</label>
+        <input type="number" id="difesa" min="1" value="80" placeholder="Es. 80" />
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="bersagli">Bersagli</label>
+        <input type="number" id="bersagli" min="0.25" step="0.25" value="1" />
+      </div>
+
+      <div class="input-group">
+        <label for="amorefiliale">Amorefiliale</label>
+        <input type="number" id="amorefiliale" min="0" step="0.1" value="1" />
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="meteo">Meteo</label>
+        <input type="number" id="meteo" min="0" step="0.1" value="1" />
+      </div>
+
+      <div class="input-group">
+        <label for="bruttoColpo">Brutto colpo</label>
+        <input type="number" id="bruttoColpo" min="0" step="0.1" value="1" />
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="scottatura">Scottatura</label>
+        <input type="number" id="scottatura" min="0" step="0.1" value="1" />
+      </div>
+
+      <div class="input-group">
+        <label for="altro">Altro</label>
+        <input type="number" id="altro" min="0" step="0.1" value="1" />
+      </div>
+    </div>
+
+    <div class="checkbox-wrapper">
+      <input type="checkbox" id="stab" />
+      <label for="stab">STAB (×1.5)</label>
+    </div>
+
+    <div class="input-group">
+      <label for="type">Efficacia tipo (Type)</label>
+      <select id="type">
+        <option value="0.25">0.25 (Super resistente)</option>
+        <option value="0.5">0.5 (Resistente)</option>
+        <option value="1" selected>1 (Neutro)</option>
+        <option value="2">2 (Super efficace)</option>
+        <option value="4">4 (Doppio super efficace)</option>
+      </select>
+    </div>
+
+    <button onclick="calcolaDanno()">Calcola Danno</button>
+
+    <div class="result" id="risultato">Inserisci i valori e premi "Calcola Danno"</div>
+
+    <div class="warning">
+      Il valore "random" viene calcolato automaticamente come un numero casuale tra 85 e 100 (diviso per 100). Il calcolo mostra il range di danno minimo e massimo possibile.
+    </div>
+  </div>
+
+  <script>
+    // Event listener per calcolo con Enter
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = document.querySelectorAll('input[type="number"], select');
+      
+      inputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            calcolaDanno();
+          }
+        });
+      });
+    });
+
+    function calcolaDanno() {
+      // Recupera i valori dai campi
+      const livello = parseFloat(document.getElementById("livello").value);
+      const potenza = parseFloat(document.getElementById("potenza").value);
+      const attacco = parseFloat(document.getElementById("attacco").value);
+      const difesa = parseFloat(document.getElementById("difesa").value);
+      const bersagli = parseFloat(document.getElementById("bersagli").value);
+      const amorefiliale = parseFloat(document.getElementById("amorefiliale").value);
+      const meteo = parseFloat(document.getElementById("meteo").value);
+      const bruttoColpo = parseFloat(document.getElementById("bruttoColpo").value);
+      const scottatura = parseFloat(document.getElementById("scottatura").value);
+      const altro = parseFloat(document.getElementById("altro").value);
+      const stab = document.getElementById("stab").checked ? 1.5 : 1.0;
+      const type = parseFloat(document.getElementById("type").value);
+
+      // Validazione
+      if ([livello, potenza, attacco, difesa, bersagli, amorefiliale, meteo, bruttoColpo, scottatura, altro, type].some(v => isNaN(v))) {
+        document.getElementById("risultato").textContent = "Per favore, inserisci tutti i valori validi.";
+        return;
+      }
+
+      // Calcola il danno minimo e massimo (random tra 85 e 100)
+      const randomMin = 0.85;
+      const randomMax = 1.00;
+
+      // Formula base senza random
+      const baseDamage = (((2 * livello / 5 + 2) * potenza * attacco / difesa) / 50 + 2);
+      
+      // Moltiplicatori
+      const multipliers = bersagli * amorefiliale * meteo * bruttoColpo * stab * type * scottatura * altro;
+
+      // Calcolo danno minimo e massimo
+      const dannoMin = Math.floor(baseDamage * multipliers * randomMin);
+      const dannoMax = Math.floor(baseDamage * multipliers * randomMax);
+
+      // Mostra il risultato
+      if (dannoMin === dannoMax) {
+        document.getElementById("risultato").innerHTML = 
+          `<strong>Danno: ${dannoMin}</strong>`;
+      } else {
+        document.getElementById("risultato").innerHTML = 
+          `<strong>Danno: ${dannoMin} - ${dannoMax}</strong>`;
+      }
+    }
+  </script>
+</body>
+</html>
