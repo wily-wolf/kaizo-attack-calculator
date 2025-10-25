@@ -209,7 +209,10 @@
         <div class="grid-2">
           <div class="input-group">
             <label for="bersagli">Bersagli</label>
-            <input type="number" id="bersagli" min="0.25" step="0.25" value="1" />
+            <select id="bersagli">
+              <option value="1" selected>1 (Singolo)</option>
+              <option value="0.75">0.75 (Multipli)</option>
+            </select>
           </div>
 
           <div class="input-group">
@@ -221,12 +224,19 @@
         <div class="grid-2">
           <div class="input-group">
             <label for="meteo">Meteo</label>
-            <input type="number" id="meteo" min="0" step="0.1" value="1" />
+            <select id="meteo">
+              <option value="0.5">0.5 (Sfavorevole)</option>
+              <option value="1" selected>1 (Neutro)</option>
+              <option value="1.5">1.5 (Favorevole)</option>
+            </select>
           </div>
 
           <div class="input-group">
             <label for="bruttoColpo">Brutto colpo</label>
-            <input type="number" id="bruttoColpo" min="0" step="0.1" value="1" />
+            <select id="bruttoColpo">
+              <option value="1" selected>1 (Normale)</option>
+              <option value="1.5">1.5 (Critico)</option>
+            </select>
           </div>
         </div>
 
